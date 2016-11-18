@@ -41,6 +41,7 @@ if [ ! -f $versionFile ]; then
     echo "latestrc=v0.0.0-init" > $versionFile
     git add $versionFile
     git commit -m "Create $versionFile"
+    git push -u origin master
 fi
 
 # read version info from file
