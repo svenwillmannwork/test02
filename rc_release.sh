@@ -51,7 +51,7 @@ if git status | (
         esac
     done
     bits="$dirty$deleted$untracked$newfile$ahead$renamed"
-    [ -n "$bits" ] && echo " $bits" || echo
+    [ -n "$bits" ] && echo " $bits" 
 ) >/dev/null; then
 	echo "The current branch is dirty and you need to clean it first before creating the release"
 	exit 1
