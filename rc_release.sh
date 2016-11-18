@@ -19,7 +19,7 @@ source $versionFile
 echo "Try to create release for $latestrc"
 
 
-# check if tag for previous release exist otherwise us master for branch
+# check if release branch exist and check it out 
 # new release release-v1.0.0, release-v1.5.2, etc.
 releaseBranchLabel="release-$latestrc"
 if git rev-parse -q --verify "refs/heads/$releaseBranchLabel" >/dev/null; then
@@ -30,10 +30,36 @@ if git rev-parse -q --verify "refs/heads/$releaseBranchLabel" >/dev/null; then
 	git pull
 else
     echo "Can not locate the branch $releaseBranchLabel, make sure it exists"
+    exit 1
 fi
 
 
 ##############################################################################
+# now check if the release branch is dirty before continuing
+##############################################################################
+
+if git status | (
+    unset dirty deleted untracked newfile ahead renamed
+    while read line ; do
+        case "$line" in
+          *modified:*)                      dirty='!' ; ;;
+          *deleted:*)                       deleted='x' ; ;;
+          *'Untracked files:')              untracked='?' ; ;;
+          *'new file:'*)                    newfile='+' ; ;;
+          *'Your branch is ahead of '*)     ahead='*' ; ;;
+          *renamed:*)                       renamed='>' ; ;;
+        esac
+    done
+    bits="$dirty$deleted$untracked$newfile$ahead$renamed"
+    [ -n "$bits" ] && echo " $bits" || echo
+) >/dev/null; then
+	echo "The current branch is dirty and you need to clean it first before creating the release"
+	exit 1
+fi
+
+
+##############################################################################
+# all conditions are met so 
 # now lets merge into master and tag
 ##############################################################################
 
