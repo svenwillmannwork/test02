@@ -35,6 +35,13 @@ if [[ $1 != v* ]]; then version=v$1; fi
 # new release release-v1.0.0, release-v1.5.2, etc.
 releaseBranchLabel=release-$version
 
+
+# make sure you are on master
+echo "Will switch to master in order to create the release branch"
+git checkout master
+git pull
+
+
 # check if there is a version info file, if not, create one and add to repo
 if [ ! -f $versionFile ]; then
     echo "Version file $versionFile not found, will create it now"
@@ -58,11 +65,8 @@ if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
 	git checkout $tag
 	git pull
 else
-    echo "Tag $tag not found will use master"
     # as the tag is not found, will use master
-	
-	git checkout master
-	git pull
+    echo "Tag $tag not found will stay on latest master"
 fi
 
 
